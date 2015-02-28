@@ -1,0 +1,5 @@
+# Dependency directory.
+web/node_modules
+
+# Built files.
+web/build
