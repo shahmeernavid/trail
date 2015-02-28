@@ -18,3 +18,14 @@ class User(db.model):
 	def __repr__(self):
 		return '<User: %s>' % self.id
 
+	def is_authenticated(self):
+		
+
+	def is_active(self):
+		return True
+
+	def is_anonymous(self):
+		return False
+
+	def get_id(self):
+		return unicode(id)
