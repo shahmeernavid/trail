@@ -3,7 +3,7 @@ import os
 import hashlib
 
 class User(db.model):
-	id = db.Column(db.Integer, primary_key=True)
+	id = db.Column(db.Integer, nullable=False, primary_key=True)
 	username = db.Column(db.String)
 	password = db.Column(db.String)
 	salt = db.Column(db.String)
@@ -19,7 +19,6 @@ class User(db.model):
 		return '<User: %s>' % self.id
 
 	def is_authenticated(self):
-		
 
 	def is_active(self):
 		return True
