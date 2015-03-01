@@ -17,4 +17,4 @@ def users_following_trail(trail_id):
  	follows = Follow.query.filter_by(trail_id = trail_id).all()
  	ids = [follow.user_id for follow in follows]
  	users = User.query.filter(User.id.in_(ids)).all()
-  	return json.dump([user.serialize() for user in users])
+  	return json.dumps([user.serialize() for user in users])

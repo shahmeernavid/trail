@@ -12,14 +12,14 @@ class Step(db.Model):
     completed = db.Column(db.Boolean, nullable=False, default=False)
     date_created = db.Column(db.DateTime, nullable=False, default=datetime.now())
 
-    trail_step_join = db.relationship(TrailStepJoin, backref='step', lazy='dynamic')
+    trail_step_joins = db.relationship(TrailStepJoin, backref='step', lazy='dynamic')
 
     def __init__(self, resource, title, description):
         self.resource = resource
         self.title = title
         self.description = description
         self.completed = False
-
+        
     def serialize(self):
         serialized_step = {
             "id": self.id,
@@ -27,6 +27,6 @@ class Step(db.Model):
             "title": self.title,
             "description": self.description,
             "completed": self.completed,
-            "date_created": self.date_created,
+            "date_created": self.date_created.strftime('%Y-%m-%dT%H:%M:%S'),
         }
         return serialized_step
