@@ -19,6 +19,7 @@ class User(db.model):
 		return '<User: %s>' % self.id
 
 	def is_authenticated(self):
+		return True
 
 	def is_active(self):
 		return True
@@ -27,4 +28,7 @@ class User(db.model):
 		return False
 
 	def get_id(self):
-		return unicode(id)
+		try:
+			return unicode(self.id)  # python 2
+		except NameError:
+			return str(self.id)  # python 3
