@@ -6,10 +6,10 @@
 var browserify = require('browserify');
 var fs = require('fs');
 var path = require('path');
-var _ = require('underscore');
 
 var BUNDLE_DIR_ = './public/bundle/';
-var TEMP_ = 'trail.temp.js';
+var SRC_DIR_ = './public/src/';
+var TEMP_ = 'js/trail.temp.js';
 
 module.exports = new (function (){
     var self = this;
@@ -29,9 +29,9 @@ module.exports = new (function (){
 
         // Create temp file.
         // TODO(shahmeer): find a way to do this without temps.
-        self.write(TEMP_, contents);
+        fs.writeFileSync(SRC_DIR_ + TEMP_, contents);
 
-        var browserified = browserify(BUNDLE_DIR_ + TEMP_);
+        var browserified = browserify(SRC_DIR_ + TEMP_);
         // Apply transforms.
         transforms.forEach(function (transform){
             browserified.transform(transform);
@@ -41,9 +41,23 @@ module.exports = new (function (){
                 throw err;
             }
             // Delete temp file.
-            fs.unlinkSync(BUNDLE_DIR_ + TEMP_);
+            fs.unlinkSync(SRC_DIR_ + TEMP_);
             // Write built file.
             done(browserifiedCode);
+        });
+    };
+
+    /**
+     * Takes an absolute directory path and returns the content of the directory.
+     *
+     * @param {String} dir: Absolute path to directory.
+     *
+     * Returns Array of directory contents (absolute paths).
+     */
+    this.readdir = function (dir){
+        var contents = fs.readdirSync(dir);
+        return contents.map(function (elem){
+            return dir + '/' + elem;
         });
     };
 
@@ -52,7 +66,7 @@ module.exports = new (function (){
      *
      * @param {String} dir: Path to directory.
      */
-    this.mkdir = function (dir){
+    this.mkBundleDir = function (dir){
         dir = path.resolve(BUNDLE_DIR_ + (dir || ''));
 
         try {
@@ -67,7 +81,7 @@ module.exports = new (function (){
      * @param {String} file: Output directory.
      * @param {String} content: File contents.
      */
-    this.write = function (file, content){
+    this.writeToBundle = function (file, content){
         file = path.resolve(BUNDLE_DIR_ + (file || ''));
         fs.writeFileSync(file, content);
     };
@@ -96,14 +110,15 @@ module.exports = new (function (){
         }
 
         var output = '';
-        _.each(dirsOrFiles, function (elem){
+        dirsOrFiles.forEach(function (elem){
             elem = path.resolve(elem);
             if(fs.statSync(elem).isFile()){
                 output += fs.readFileSync(elem) + '\n';
             }
             else if(fs.statSync(elem).isDirectory()){
                 if (recursive) {
-                    output += self.concat(elem);
+                    var dirContents = self.readdir(elem);
+                    output += self.concat(dirContents);
                 }
             }
             else {

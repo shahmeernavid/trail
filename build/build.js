@@ -11,7 +11,7 @@ GLOBAL.task = function (desc, func){
     });
 };
 
-fsutils.mkdir();
+fsutils.mkBundleDir();
 
 // Add tasks here.
 require('./buildjs');

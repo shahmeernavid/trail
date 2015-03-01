@@ -4,7 +4,7 @@ var fsutils = require('./fs_utils');
 
 var TEMP = 'main.temp.js';
 
-fsutils.mkdir('js');
+fsutils.mkBundleDir('js');
 
 // Frontend libraries.
 var components = fsutils.concat([
@@ -12,14 +12,15 @@ var components = fsutils.concat([
 ]);
 // JS code.
 var js_list = fsutils.concat([
-    'public/src/js/views/todo.js'
+    'public/src/js/routes.js',
+    'public/src/js/index.js'
 ]);
 
 // TODO(shahmeer): Minification.
 // TODO(shahmeer): Watch.
 var buildJs = function (done){
     fsutils.browserify(js_list, [reactify], function (code){
-        fsutils.write('js/trail.js', components + code);
+        fsutils.writeToBundle('js/trail.js', components + code);
         done();
     });
 };
