@@ -1,6 +1,8 @@
 # Dependency directory.
 node_modules
 
+*.log
+
 # Built files.
 public/bundle
 
