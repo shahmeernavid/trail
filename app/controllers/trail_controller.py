@@ -1,40 +1,63 @@
-from app import db, login_manager, app
-from app.models.user import User
-from flask_wtf import Form
-from flask import render_template, flash, redirect, request, url_for, session, send_file
-from wtforms import validators, TextField, PasswordField
-from flask.ext.login import login_user, logout_user, login_required
-import hashlib
-from flask_oauth import OAuth
+from app import db, app
+from app.models.trail import Trail
+from app.models.trail_step_join import TrailStepJoin
+from app.models.follow import Follow
+from flask import jsonify, request
+import json
 
-@app.route('/trail/<int: trail_id>', methods=['GET'])
-def get(trail_id):
-    trail = Trail.query.get(trail_id)
-    return jsonify(** trail.serialize())
+@app.route('/trail/<int:trail_id>', methods=['GET', 'PUT'])
+def get_or_update_trail(trail_id):
+    if request.method == 'GET':
+        trail = Trail.query.get(trail_id)
+        return jsonify(** trail.serialize())
+    else:
+        request_dict = request.get_json()
+        trail = Trail.query.get(trail_id)
+
+        trail.topic = request_dict['topic']
+        trail.trail_type = request_dict['trail_type']
+
+        db.session.add(trail)
+        db.session.commit()
+        return jsonify(**{'id' : trail.id})
 
 @app.route('/trail/', methods=['POST'])
-def create():
+def create_trail():
     request_dict = request.get_json()
-    trail = trail(request_dict.id, request_dict.topic, request_dict.popularity_count, request_dict.trail_type)
+    trail = trail(request_dict['topic'], request_dict['user_id'], request_dict['parent_id'], request_dict['trail_type'])
     db.session.add(trail)
     db.session.commit()
+    return jsonify(**{'id' : trail.id})
 
-@app.route('/trail/<int: trail_id>', methods=['PUT'])
-def update(trail_id):
-    request_dict = request.get_json()
-    trail = Trail.query.get(trail_id)
-
-    trail.topic = request_dict.topic
-    trail.popularity_count = request_dict.popularity_count
-    trail.trail_type = request_dict.trail_type
-
-    db.session.add(trail)
-    db.session.commit()
-
-@app.route('/trail/<int: trail_id/delete', methods=['POST'])
-def delete(trail_id):
+@app.route('/trail/delete/<int:trail_id>', methods=['POST'])
+def delete_trail(trail_id):
     request_dict = request.get_json()
     trail = Trail.query.get(trail_id)
 
     db.session.delete(trail)
     db.session.commit()
+    return jsonify(**{'id' : trail.id})
+
+@app.route('/trails', methods=['GET'])
+def list_trails():
+    trails = Trail.query.all()
+    return json.dump([trail.serialize() for trail in trails])
+
+@app.route('/trails/<string>', methods=['GET'])
+def search_trails():
+    trails = Trail.query.filter(Trail.topic.contains(string)).all()
+    return json.dump([trail.serialize() for trail in trails])
+
+@app.route('/trails/user/<int:user_id>', methods=['GET'])
+def trails_followed_by_user(user_id):
+    follows = Follow.query.filter_by(user_id = user_id).all()
+    ids = [follow.trail_id for follow in follows]
+    trails = Trail.query.filter(Trail.id.in_(ids)).all()
+    return json.dump([trail.serialize() for trail in trails])
+
+@app.route('/trails/step/<int:step_id>', methods=['GET'])
+def trails_containing_step(step_id):
+    trail_step_joins = TrailStepJoin.query.filter_by(step_id = step_id).all()
+    ids = [trail_step_join.trail_id for trail_step_join in trail_step_joins]
+    trails = Trail.query.filter(Trail.id.in_(ids)).all()
+    return json.dump([trail.serialize() for trail in trails])

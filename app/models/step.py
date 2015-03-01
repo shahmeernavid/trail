@@ -14,11 +14,10 @@ class Step(db.Model):
 
     trail_step_join = db.relationship(TrailStepJoin, backref='step', lazy='dynamic')
 
-    def __init__(self, resource, title, description, parent, completed):
+    def __init__(self, resource, title, description):
         self.resource = resource
         self.title = title
         self.description = description
-        self.parent = parent
         self.completed = False
 
     def serialize(self):

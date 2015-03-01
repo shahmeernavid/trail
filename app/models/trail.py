@@ -12,10 +12,14 @@ class Trail(db.Model):
     parent_id = db.Column(db.Integer, db.ForeignKey("trail.id"))
     trail_type = db.Column(db.String, nullable=False)
 
-    def __init__(self, id, topic, popularity_count, trail_type):
-        self.id = id
+    follows = db.relationship(Follow, backref='trail', lazy='dynamic')
+    trail_step_join = db.relationship(TrailStepJoin, backref='trail', lazy='dynamic')
+
+    def __init__(self, topic, user_id, parent_id, trail_type):
         self.topic = topic
         self.popularity_count = 0
+        self.user_id = user_id
+        self.parent_id
         self.trail_type = trail_type
 
     def serialize(self):
