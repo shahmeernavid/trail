@@ -16,3 +16,14 @@ class Step(db.model):
         self.title = title
         self.description = description
         self.completed = False
+
+    def serialize(self):
+        serialized_step = {
+            "id": self.id,
+            "resource": self.resource,
+            "title": self.title,
+            "description": self.description,
+            "completed": self.completed,
+            "date_created": self.date_created,
+        }
+        return serialized_step
