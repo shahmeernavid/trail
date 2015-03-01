@@ -11,7 +11,7 @@ class Step(db.model):
     completed = db.Column(db.Boolean, nullable=False, default=False)
     date_created = db.Column(db.DateTime, nullable=False, default=datetime.now())
 
-    def __init__(self, resource, title, description, parent):
+    def __init__(self, resource, title, description, completed):
         self.resource = resource
         self.title = title
         self.description = description

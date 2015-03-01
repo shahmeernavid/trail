@@ -24,7 +24,6 @@ def update(trail_id):
     request_dict = request.get_json()
     trail = Trail.query.get(trail_id)
 
-    trail.id = request_dict.id
     trail.topic = request_dict.topic
     trail.popularity_count = request_dict.popularity_count
     trail.trail_type = request_dict.trail_type
