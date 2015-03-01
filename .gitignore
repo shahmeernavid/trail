@@ -1,5 +1,7 @@
 # Dependency directory.
-web/node_modules
+node_modules
 
 # Built files.
-web/build
+public/bundle
+
+.DS_STORE
