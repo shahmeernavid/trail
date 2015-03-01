@@ -1,7 +1,7 @@
 from app import db, login_manager, app
 from app.models.user import User
 from flask_wtf import Form
-from flask import render_template, flash, redirect, request, url_for, session
+from flask import render_template, flash, redirect, request, url_for, session, send_file
 from wtforms import validators, TextField, PasswordField
 from flask.ext.login import login_user, logout_user, login_required
 import hashlib
@@ -50,12 +50,12 @@ class LoginForm(Form):
 	def validate_login(self):
 		user = self.get_user()
 
-	if user is None:
-		raise validators.ValidationError('Invalid user')
+		if user is None:
+			raise validators.ValidationError('Invalid user')
 
-	# we're comparing the plaintext pw with the the hash from the db
-	if not self.check_password_hash(user.password, user.salt, self.password.data):
-  		raise validators.ValidationError('Invalid password')
+		# we're comparing the plaintext pw with the the hash from the db
+		if not self.check_password_hash(user.password, user.salt, self.password.data):
+	  		raise validators.ValidationError('Invalid password')
 
 	def get_user(self):
 		return db.session.query(User).filter_by(username=self.username.data).first()
@@ -64,10 +64,15 @@ class LoginForm(Form):
 		password = hashlib.sha256(salt + password).hexdigest()
 		return correctPassword == password
 
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def catch_all(path):
+    return send_file('../' + path)
+
 @app.route("/")
 @login_required
 def index():
-	return render_template("index.html")
+	return send_file('templates/index.html')
 
 @app.route("/test")
 @login_required
