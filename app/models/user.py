@@ -1,19 +1,24 @@
 from app import db
 import os
 import hashlib
+from app.models.follow import Follow
 
-class User(db.model):
+class User(db.Model):
 	id = db.Column(db.Integer, nullable=False, primary_key=True)
 	username = db.Column(db.String)
 	password = db.Column(db.String)
 	salt = db.Column(db.String)
 	email = db.Column(db.String)
+	facebook_id = db.Column(db.String)
 
-	def __init__(self, username, password, email):
+	follows = db.relationship(Follow, backref='user', lazy='dynamic')
+
+	def __init__(self, username, password, email, facebook_id):
 		self.salt = os.urandom(16).encode('base_64')
 		self.password = hashlib.sha256(self.salt + password).hexdigest()
 		self.username = username
 		self.email = email
+		self.facebook_id = facebook_id
 
 	def __repr__(self):
 		return '<User: %s>' % self.id

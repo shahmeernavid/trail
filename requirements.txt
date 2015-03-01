@@ -12,5 +12,6 @@ httplib2==0.9
 itsdangerous==0.24
 oauth2==1.5.211
 psycopg2==2.6
+requests==2.5.3
 wsgiref==0.1.2
 yolk==0.4.3

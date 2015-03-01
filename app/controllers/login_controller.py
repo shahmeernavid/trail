@@ -6,6 +6,8 @@ from wtforms import validators, TextField, PasswordField
 from flask.ext.login import login_user, logout_user, login_required
 import hashlib
 from flask_oauth import OAuth
+import requests
+import json
 
 oauth = OAuth()
 
@@ -26,18 +28,25 @@ def get_facebook_token(token='user'):
 @app.route('/oauth-authorized')
 @facebook.authorized_handler
 def oauth_authorized(resp):
-    next_url = request.args.get('next') or url_for('index')
+    next_url = url_for('index')
     if resp is None:
         flash(u'You denied the request to sign in.')
         return redirect(next_url)
 
-    session['facebook_token'] = (
-        resp['oauth_token'],
-        resp['oauth_token_secret']
-    )
-    session['facebook_user'] = resp['screen_name']
+    session['facebook_token'] = resp['access_token']
 
-    flash('You were signed in as %s' % resp['screen_name'])
+    flash('You were signed in as %s' % resp['access_token'])
+    response_dict = requests.get('https://graph.facebook.com/me?fields=name,id,email&access_token=%s' % session['facebook_token']).content
+    python_dict = json.loads(response_dict)
+    print python_dict
+    facebook_id = str(python_dict['id'])
+    #facebook_email = response_dict['email']
+    user = User.query.filter_by(facebook_id=facebook_id).first()
+    if user == None:
+    	user = User('fb%s' % facebook_id, '', '', facebook_id)
+    	db.session.add(user)
+    	db.session.commit()
+    login_user(user)
     return redirect(next_url)
 
 login_manager.login_view = 'login'
@@ -62,17 +71,12 @@ class LoginForm(Form):
 
 	def check_password_hash(self, correctPassword, salt, password):
 		password = hashlib.sha256(salt + password).hexdigest()
-		return correctPassword == password
+		return correctPassword == PasswordField
 
-@app.route("/")
+@app.route('/')
 @login_required
 def index():
-	return send_file('templates/index.html')
-
-@app.route("/test")
-@login_required
-def test():
-	return render_template("test.html")
+	return render_template('index.html')
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -91,8 +95,9 @@ def login():
 
 @app.route('/facebookAuthenticate')
 def facebookAuthenticate():
-    return facebook.authorize(callback=url_for('oauth_authorized',
-        next=request.args.get('next') or request.referrer or None))
+	return facebook.authorize(callback=url_for('oauth_authorized',
+    	next=request.args.get('next') or request.referrer or None,
+    	_external={'SERVER_NAME':'localhost'}))
 
 @app.route("/logout")
 @login_required
