@@ -64,14 +64,6 @@ class LoginForm(Form):
 		password = hashlib.sha256(salt + password).hexdigest()
 		return correctPassword == password
 
-<<<<<<< HEAD
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def catch_all(path):
-    return send_file('../public/' + path)
-
-=======
->>>>>>> 1abf680174a52474656474727dd5e3c35d453aa3
 @app.route("/")
 @login_required
 def index():
