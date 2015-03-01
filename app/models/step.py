@@ -1,6 +1,5 @@
 from app import db
 import os
-import hashlib
 from datetime import datetime
 
 class Step(db.model):
@@ -17,26 +16,3 @@ class Step(db.model):
         self.title = title
         self.description = description
         self.completed = False
-
-    # increment counter of the parent
-    # all trails it points to, updates trails
-
-    def set_resource(self, resource):
-        self.resource = resource
-
-    def set_title(self, title):
-        self.title = title
-
-    def set_description(self, description):
-        self.description = description
-
-    def complete_step(self):
-        self.completed = True
-
-    def remove_step(self):
-        self.id = None
-        self.resource = None
-        self.title = None
-        self.description = None
-        self.completed = None
-        self.date_created = None
