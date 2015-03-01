@@ -7,3 +7,5 @@ node_modules
 public/bundle
 
 .DS_STORE
+
+*.pyc
