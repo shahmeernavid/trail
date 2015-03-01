@@ -67,7 +67,7 @@ class LoginForm(Form):
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def catch_all(path):
-    return send_file('../' + path)
+    return send_file('../public/' + path)
 
 @app.route("/")
 @login_required
