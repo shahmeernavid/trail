@@ -8,5 +8,3 @@ class TrailStepJoin(db.Model):
 	def __init__(self, trail_id, self_id):
 		self.trail_id = trail_id
 		self.self_id = self_id
-
-

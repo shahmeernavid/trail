@@ -1,6 +1,5 @@
 from app import db
 import os
-import hashlib
 from datetime import datetime
 from app.models.trail_step_join import TrailStepJoin
 
@@ -15,31 +14,20 @@ class Step(db.Model):
 
     trail_step_join = db.relationship(TrailStepJoin, backref='step', lazy='dynamic')
 
-    def __init__(self, resource, title, description, parent):
+    def __init__(self, resource, title, description, parent, completed):
         self.resource = resource
         self.title = title
         self.description = description
+        self.parent = parent
         self.completed = False
 
-    # increment counter of the parent
-    # all trails it points to, updates trails
-
-    def set_resource(self, resource):
-        self.resource = resource
-
-    def set_title(self, title):
-        self.title = title
-
-    def set_description(self, description):
-        self.description = description
-
-    def complete_step(self):
-        self.completed = True
-
-    def remove_step(self):
-        self.id = None
-        self.resource = None
-        self.title = None
-        self.description = None
-        self.completed = None
-        self.date_created = None
+    def serialize(self):
+        serialized_step = {
+            "id": self.id,
+            "resource": self.resource,
+            "title": self.title,
+            "description": self.description,
+            "completed": self.completed,
+            "date_created": self.date_created,
+        }
+        return serialized_step
