@@ -73,11 +73,6 @@ class LoginForm(Form):
 		password = hashlib.sha256(salt + password).hexdigest()
 		return correctPassword == PasswordField
 
-@app.route('/')
-@login_required
-def index():
-	return render_template('index.html')
-
 @login_manager.user_loader
 def load_user(user_id):
 	return User.query.get(user_id)
