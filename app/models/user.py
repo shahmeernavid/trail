@@ -2,7 +2,7 @@ from app import db
 import os
 import hashlib
 
-class User(db.model):
+class User(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	username = db.Column(db.String)
 	password = db.Column(db.String)
@@ -19,7 +19,7 @@ class User(db.model):
 		return '<User: %s>' % self.id
 
 	def is_authenticated(self):
-		
+		return True
 
 	def is_active(self):
 		return True
@@ -28,4 +28,7 @@ class User(db.model):
 		return False
 
 	def get_id(self):
-		return unicode(id)
+		try:
+			return unicode(self.id)  # python 2
+		except NameError:
+			return str(self.id)  # python 3
