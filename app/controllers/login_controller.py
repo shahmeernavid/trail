@@ -64,11 +64,6 @@ class LoginForm(Form):
 		password = hashlib.sha256(salt + password).hexdigest()
 		return correctPassword == password
 
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def catch_all(path):
-    return send_file('../' + path)
-
 @app.route("/")
 @login_required
 def index():
@@ -104,3 +99,8 @@ def facebookAuthenticate():
 def logout():
     logout_user()
     return redirect(url_for("index"))
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def catch_all(path):
+    return send_file('../public/' + path)
